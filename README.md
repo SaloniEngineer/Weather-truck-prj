@@ -231,43 +231,5 @@ routing/tests/test_load_rule_does_not_downgrade_higher_weather_risk PASSED [ 93%
 routing/tests/test_sampling.py::TestSamplingService::test_segment_miles_sum_matches_total_distance PASSED [ 96%]
 routing/tests/test_sampling.py::TestSamplingService::test_eta_progression PASSED [100%]
 
-============================= 31 passed in 1.53s ==============================
-```
 
----
 
-## 5. Loom Walkthrough Script & Interview Presentation Guide
-
-Use this structured script during your 5–10 minute Loom video:
-
-1. **Introduction (1 min)**:
-   - Introduce the goal: Weather-aware truck routing taking into account ETA-based weather forecasts, vehicle cargo weight limits, and corridor-wide atmospheric fronts.
-   - Show the UI: Left sidebar with dispatch controls, route cards with badges, right interactive map with 3 colored highway corridors, and bottom 48-hour timeline scrubber.
-
-2. **Clear-Weather Trip Demo (1.5 min)**:
-   - Click "Chicago ➔ Denver" preset with 35,000 lb load.
-   - Show the 3 distinct routes generated.
-   - Click a checkpoint dot on the map: show that each dot displays its ETA (departure + cumulative travel duration), wind speed in mph, rain, snowfall, and safety level.
-   - Explain how Route A is recommended: shortest duration with 0 No-Travel and 0 Severe miles.
-
-3. **Storm & Load Rule Escalation Demo (2 min)**:
-   - Click "Seattle ➔ Dallas" or increase load weight to 42,000 lb with high crosswinds.
-   - Demonstrate how the load rule triggers: show a checkpoint where a 40 mph crosswind is safe for a light truck, but immediately escalates to **Severe** or **No Travel** because cargo exceeds 40,000 lb.
-   - Point out the explanation text in the popup and card banner explaining the rollover hazard.
-
-4. **Corridor Heatmap & Performance (1.5 min)**:
-   - Point to the bottom forecast panel: show how the slider scrubs from `+0h` to `+48h`.
-   - Hit "Play" to watch the weather system sweep across the corridor.
-   - Highlight the technical choice: *"Rather than thrashing the network on every slider movement, we pre-fetch the 48-hour temporal matrix once for corridor points, enabling instantaneous 60fps client-side scrubbing."*
-
-5. **Code Walkthrough & Pure Risk Engine (2 min)**:
-   - Open `routing/services/risk_service.py`: explain the use of **half-open intervals** (`[25, 35)`) avoiding gap bugs, the max-risk condition aggregator, and the load escalation logic.
-   - Run `pytest` live in terminal to show all 31 tests passing.
-
----
-
-## 6. Assumptions & Engineering Trade-offs
-
-1. **OSRM Server Alternatives**: Public OSRM routing servers occasionally return only 1 or 2 alternative routes depending on route length. To guarantee the assessment's 3-route requirement under all conditions, `routing_service.py` computes perpendicular midpoint offsets to query real highway detours, ensuring 3 drivable paths are always evaluated.
-2. **Batching vs API Quotas**: Open-Meteo allows batching up to 50 coordinates per request without an API key. We chunk sampling requests into batches of 35–40 coordinates and cache them in-memory for 30 minutes, keeping response times under 1.5 seconds while respecting third-party rate limits.
-3. **Continuous Half-Open Intervals**: Weather metrics are continuous floats. Using half-open intervals ($[25.0, 35.0)$) ensures edge values like $34.5\text{ mph}$ or $24.99\text{ mph}$ are classified without rounding errors.
