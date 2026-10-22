@@ -3,6 +3,9 @@ import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
 import CorridorForecastSlider from './components/CorridorForecastSlider';
 
+
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 function getInitialDateTime() {
   const now = new Date();
   // round to next hour
@@ -48,7 +51,8 @@ export default function App() {
         ? new Date().toISOString()
         : depDate.toISOString();
 
-      const response = await fetch('/api/routes/analyze/', {
+      // FIX: relative URL ki jagah API_URL use kiya
+      const response = await fetch(`${API_URL}/api/routes/analyze/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,7 +81,7 @@ export default function App() {
     } catch (err) {
       console.error('Error analyzing routes:', err);
       if (err.name === 'TypeError' && String(err.message).toLowerCase().includes('fetch')) {
-        setError('Cannot reach backend server. Please make sure the Django server is running on http://127.0.0.1:8000.');
+        setError('Cannot reach backend server. It may be waking up, please try again in a minute.');
       } else {
         setError(err.message || 'Failed to fetch weather routing analysis.');
       }
