@@ -3,8 +3,8 @@ import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
 import CorridorForecastSlider from './components/CorridorForecastSlider';
 
-
-const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+// Backend (Render) ka live URL
+const API_URL = 'https://truck-weather-api.onrender.com';
 
 function getInitialDateTime() {
   const now = new Date();
@@ -51,7 +51,6 @@ export default function App() {
         ? new Date().toISOString()
         : depDate.toISOString();
 
-      // FIX: relative URL ki jagah API_URL use kiya
       const response = await fetch(`${API_URL}/api/routes/analyze/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
