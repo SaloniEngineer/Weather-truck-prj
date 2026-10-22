@@ -4,7 +4,7 @@ import MapView from './components/MapView';
 import CorridorForecastSlider from './components/CorridorForecastSlider';
 
 // Backend (Render) ka live URL
-const API_URL = 'https://truck-weather-api.onrender.com';
+const API_URL = 'https://weather-truck-prj.onrender.com';
 
 function getInitialDateTime() {
   const now = new Date();

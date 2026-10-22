@@ -123,6 +123,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # CORS configuration
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://weather-truck-prj.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 
 # In-memory caching for weather and geocoding requests
 CACHES = {
